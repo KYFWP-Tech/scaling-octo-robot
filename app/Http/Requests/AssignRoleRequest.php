@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Status;
+use App\Enums\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rule;
 
-class AdminRequest extends FormRequest
+class AssignRoleRequest extends FormRequest
 {
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -15,9 +15,7 @@ class AdminRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'status' => ['required', new Enum(Status::class)],
+            'role' => ['required', Rule::enum(Role::class), Rule::exists('roles', 'name')],
         ];
     }
 }
