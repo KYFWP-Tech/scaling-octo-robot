@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
+use App\Models\Permission;
 
 class PermissionPolicy
 {
@@ -20,10 +20,5 @@ class PermissionPolicy
     public function update(User $user, Permission $permission): bool
     {
         return $user->can('permissions.update');
-    }
-
-    public function destroy(User $user, Permission $permission): bool
-    {
-        return $user->can('permissions.destroy') && ! $permission->roles()->exists();
     }
 }

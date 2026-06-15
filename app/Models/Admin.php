@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Admin extends Model 
+class Admin extends Model
 {
     use Authenticatable, HasFactory, HasUuids, MakeUser;
 

@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePermissionRequest;
 use App\Http\Resources\PermissionResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\Permission\Models\Permission;
-use Symfony\Component\HttpFoundation\Response;
+use App\Models\Permission;
 
 /**
  * @group Permission Management
@@ -22,7 +20,6 @@ class PermissionController extends Controller
         $this->middleware('can:index,'.Permission::class)->only(['index']);
         $this->middleware('can:show,permission')->only(['show']);
         $this->middleware('can:update,permission')->only(['update']);
-        $this->middleware('can:destroy,permission')->only(['destroy']);
     }
 
     public function index(): AnonymousResourceCollection
@@ -42,12 +39,5 @@ class PermissionController extends Controller
         $permission->update($request->validated());
 
         return new PermissionResource($permission);
-    }
-
-    public function destroy(Permission $permission): JsonResponse
-    {
-        $permission->delete();
-
-        return response()->json([], Response::HTTP_NO_CONTENT);
     }
 }

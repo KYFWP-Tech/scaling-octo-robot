@@ -61,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             'admin' => Admin::class,
             'contributor' => Contributor::class,
             'reader' => Reader::class,
+            'user' => User::class,
         ]);
 
         Gate::before(fn (User $user, string $ability) => $user->hasRole(AdminRole::SuperAdmin->value) ? true : null);

@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 class RolePolicy
 {
@@ -20,10 +20,5 @@ class RolePolicy
     public function update(User $user, Role $role): bool
     {
         return $user->can('roles.update');
-    }
-
-    public function destroy(User $user, Role $role): bool
-    {
-        return $user->can('roles.destroy');
     }
 }

@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Spatie\Permission\Models\Role;
-use Symfony\Component\HttpFoundation\Response;
+use App\Models\Role;
 
 /**
  * @group Role Management
@@ -22,7 +20,6 @@ class RoleController extends Controller
         $this->middleware('can:index,'.Role::class)->only(['index']);
         $this->middleware('can:show,role')->only(['show']);
         $this->middleware('can:update,role')->only(['update']);
-        $this->middleware('can:destroy,role')->only(['destroy']);
     }
 
     public function index(): AnonymousResourceCollection
@@ -42,12 +39,5 @@ class RoleController extends Controller
         $role->syncPermissions($request->validated('permissions'));
 
         return new RoleResource($role->load('permissions'));
-    }
-
-    public function destroy(Role $role): JsonResponse
-    {
-        $role->delete();
-
-        return response()->json([], Response::HTTP_NO_CONTENT);
     }
 }

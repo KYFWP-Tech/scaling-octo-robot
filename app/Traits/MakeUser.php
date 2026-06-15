@@ -13,7 +13,7 @@ trait MakeUser
         $user['name'] = $this->name;
         $user['email'] = $this->email;
         $user['profile_id'] = $this->id;
-        $user['profile_type'] = $this::class;
+        $user['profile_type'] = $this->getMorphClass();
         $user['status'] = Status::INACTIVE->value;
         $user->save();
 

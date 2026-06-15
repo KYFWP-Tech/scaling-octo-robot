@@ -291,10 +291,7 @@ class AdminController extends Controller
 
         return DB::transaction(function () use ($verification, $validated) {
             $user = $verification->user;
-            $user->forceFill([
-                'password' => $validated['password'],
-                'email_verified_at' => now(),
-            ])->save();
+            $user->verify($validated['password']);
 
             $admin = $user->profile;
             $verification->delete();
