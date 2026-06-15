@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminRequest;
+use App\Http\Requests\AssignRoleRequest;
 use App\Http\Requests\UpdateAuthenticatedUserRequest;
 use App\Http\Requests\VerifyAdminRequest;
 use App\Http\Resources\AdminResource;
@@ -28,6 +29,7 @@ class AdminController extends Controller
         $this->middleware('can:show,admin')->only(['show']);
         $this->middleware('can:update,admin')->only(['update']);
         $this->middleware('can:destroy,admin')->only(['destroy']);
+        $this->middleware('can:assignRole,admin')->only(['assignRole']);
     }
 
     /**
@@ -69,14 +71,13 @@ class AdminController extends Controller
      *    "total": 1
      *  }
      * }
-     *
      * @response 403 {
      *  "message": "You are not authorized to view admin users."
      * }
      */
     public function index(): AnonymousResourceCollection
     {
-        $admins = Admin::with('user')->latest()->paginate();
+        $admins = Admin::latest()->paginate();
 
         return AdminResource::collection($admins);
     }
@@ -102,14 +103,13 @@ class AdminController extends Controller
      *    }
      *  }
      * }
-     *
      * @response 404 {
      *  "message": "Admin not found."
      * }
      */
     public function show(Admin $admin): AdminResource
     {
-        return new AdminResource($admin->load('user'));
+        return new AdminResource($admin->load(['user.roles']));
     }
 
     /**
@@ -135,7 +135,6 @@ class AdminController extends Controller
      *    }
      *  }
      * }
-     *
      * @response 422 {
      *  "message": "The given data was invalid.",
      *  "errors": {
@@ -148,9 +147,11 @@ class AdminController extends Controller
         $validated = $request->validated();
 
         return DB::transaction(function () use ($validated) {
-
-            $admin = Admin::create($validated);
-            $admin->makeUser([]);
+            $admin = Admin::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ]);
+            $admin->makeUser(['status' => $validated['status']]);
 
             return new AdminResource($admin->load('user'));
         });
@@ -162,6 +163,7 @@ class AdminController extends Controller
      * Update an existing admin user's information.
      *
      * @urlParam admin string required The UUID of the admin. Example: 550e8400-e29b-41d4-a716-446655440000
+     *
      * @bodyParam name string optional The name of the admin. Example: John Doe
      * @bodyParam email string optional The email address of the admin. Must be unique. Example: john@example.com
      *
@@ -180,11 +182,9 @@ class AdminController extends Controller
      *    }
      *  }
      * }
-     *
      * @response 404 {
      *  "message": "Admin not found."
      * }
-     *
      * @response 422 {
      *  "message": "The given data was invalid.",
      *  "errors": {
@@ -198,20 +198,38 @@ class AdminController extends Controller
 
         return DB::transaction(function () use ($admin, $validated) {
             $admin->update($validated);
-            if (isset($validated['email'])) {
 
+            if (isset($validated['email'])) {
                 $admin->user->forceFill([
                     'email' => $validated['email'],
                     'email_verified_at' => null,
                 ])->save();
 
                 $admin->user->sendVerificationEmail();
-            }else{
+            } else {
                 $admin->user->update($validated);
             }
 
             return new AdminResource($admin->load('user'));
         });
+    }
+
+    /**
+     * Assign Role
+     *
+     * Assign a role to an admin user.
+     *
+     * @urlParam admin string required The UUID of the admin. Example: 550e8400-e29b-41d4-a716-446655440000
+     *
+     * @bodyParam role string required The role to assign. Example: admin
+     */
+    public function assignRole(AssignRoleRequest $request, Admin $admin): AdminResource
+    {
+        $role = $request->validated('role');
+
+        $admin->user->syncRoles([$role]);
+
+        return new AdminResource($admin->load(['user.roles']));
     }
 
     /**
@@ -224,7 +242,6 @@ class AdminController extends Controller
      * @response 200 {
      *  "message": "Admin deleted successfully"
      * }
-     *
      * @response 404 {
      *  "message": "Admin not found."
      * }
@@ -251,11 +268,9 @@ class AdminController extends Controller
      * @response 200 {
      *  "message": "Account setup completed successfully"
      * }
-     *
      * @response 404 {
      *  "message": "Invalid or expired verification code."
      * }
-     *
      * @response 422 {
      *  "message": "The given data was invalid.",
      *  "errors": {
@@ -276,15 +291,12 @@ class AdminController extends Controller
 
         return DB::transaction(function () use ($verification, $validated) {
             $user = $verification->user;
-            $user->forceFill([
-                'password' => $validated['password'],
-                'email_verified_at' => now(),
-            ])->save();
+            $user->verify($validated['password']);
 
             $admin = $user->profile;
             $verification->delete();
 
-            return new AdminResource($admin->load('user'));
+            return new AdminResource($admin->load(['user.roles']));
         });
     }
 }

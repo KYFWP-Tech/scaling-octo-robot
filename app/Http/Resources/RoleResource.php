@@ -5,25 +5,17 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminResource extends JsonResource
+class RoleResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'email' => $this->email,
-            'role' => $this->when(
-                $this->relationLoaded('user') && $this->user?->relationLoaded('roles'),
-                fn () => new RoleResource($this->user->roles->first()),
-            ),
-            'user' => new UserResource($this->whenLoaded('user')),
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,
         ];

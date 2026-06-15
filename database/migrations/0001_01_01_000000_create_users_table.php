@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->uuidMorphs('profile');
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->char('status', 1);
             $table->rememberToken();
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\Role as AdminRole;
 use App\Models\Admin;
 use App\Models\Contributor;
 use App\Models\Reader;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -59,7 +61,10 @@ class AppServiceProvider extends ServiceProvider
             'admin' => Admin::class,
             'contributor' => Contributor::class,
             'reader' => Reader::class,
+            'user' => User::class,
         ]);
+
+        Gate::before(fn (User $user, string $ability) => $user->hasRole(AdminRole::SuperAdmin->value) ? true : null);
 
         /**
          * Get the authenticated user's profile and make it available to the request guard.
@@ -84,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-     /**
+    /**
      * Configure the rate limiters for the application.
      */
     protected function configureRateLimiting(): void
