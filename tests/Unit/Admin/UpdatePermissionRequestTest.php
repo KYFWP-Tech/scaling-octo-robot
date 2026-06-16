@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Requests\UpdatePermissionRequest;
+use App\Http\Requests\Admin\UpdatePermissionRequest;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 
@@ -14,7 +14,7 @@ describe('UpdatePermissionRequest', function () {
 
         $request = $this->createFormRequest(
             UpdatePermissionRequest::class,
-            'permissions.update',
+            'admins.permissions.update',
             'PUT',
             ['permission' => $permission],
         );
@@ -31,7 +31,7 @@ describe('UpdatePermissionRequest', function () {
 
         $request = $this->createFormRequest(
             UpdatePermissionRequest::class,
-            'permissions.update',
+            'admins.permissions.update',
             'PUT',
             ['permission' => $permission],
         );
@@ -46,7 +46,7 @@ describe('UpdatePermissionRequest', function () {
 
         $request = $this->createFormRequest(
             UpdatePermissionRequest::class,
-            'permissions.update',
+            'admins.permissions.update',
             'PUT',
             ['permission' => $permission],
         );

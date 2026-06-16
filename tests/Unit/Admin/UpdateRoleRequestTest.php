@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Requests\UpdateRoleRequest;
+use App\Http\Requests\Admin\UpdateRoleRequest;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 

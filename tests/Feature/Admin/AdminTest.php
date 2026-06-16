@@ -255,7 +255,7 @@ describe('Admin', function () {
             expect(Verification::find($verification->id))->toBeNull();
         });
 
-        it('returns 400 when invitation expired', function () {
+        it('returns 422 when invitation expired', function () {
             ['user' => $user] = $this->createAdminWithRole(Role::Editor);
 
             $verification = Verification::create([
@@ -270,7 +270,7 @@ describe('Admin', function () {
                 'password' => 'newpassword123',
                 'password_confirmation' => 'newpassword123',
                 'token' => $verification->code,
-            ])->assertStatus(400);
+            ])->assertStatus(422);
         });
 
         it('returns 422 for invalid token', function () {

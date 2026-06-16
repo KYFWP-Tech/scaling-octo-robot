@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Enums\Role as AdminRole;
 use App\Models\Admin;
+use App\Models\Article;
+use App\Models\Category;
 use App\Models\Contributor;
 use App\Models\Reader;
 use App\Models\User;
@@ -59,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap([
             'admin' => Admin::class,
+            'article' => Article::class,
+            'category' => Category::class,
             'contributor' => Contributor::class,
             'reader' => Reader::class,
             'user' => User::class,

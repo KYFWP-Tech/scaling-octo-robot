@@ -5,6 +5,10 @@ namespace Tests;
 use App\Enums\Role;
 use App\Enums\Status;
 use App\Models\Admin;
+use App\Models\Article;
+use App\Models\Category;
+use App\Models\Contributor;
+use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -50,6 +54,80 @@ abstract class TestCase extends BaseTestCase
         Sanctum::actingAs($user);
 
         return $this;
+    }
+
+    /**
+     * @param  array<string, mixed>  $contributorAttrs
+     * @return array{contributor: Contributor, user: User}
+     */
+    protected function createContributorWithUser(array $contributorAttrs = []): array
+    {
+        $contributor = Contributor::factory()->create($contributorAttrs);
+
+        $user = User::factory()->create([
+            'name' => $contributor->name,
+            'email' => $contributor->email,
+            'profile_id' => $contributor->id,
+            'profile_type' => $contributor->getMorphClass(),
+            'status' => Status::ACTIVE,
+            'password' => 'password',
+        ]);
+
+        return [
+            'contributor' => $contributor->fresh(),
+            'user' => $user->fresh(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $contributorAttrs
+     */
+    protected function actingAsContributor(array $contributorAttrs = []): static
+    {
+        ['user' => $user] = $this->createContributorWithUser($contributorAttrs);
+
+        Sanctum::actingAs($user);
+
+        return $this;
+    }
+
+    /**
+     * @param  array<string, mixed>  $attrs
+     */
+    protected function createCategory(array $attrs = []): Category
+    {
+        return Category::factory()->create($attrs);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attrs
+     */
+    protected function createArticleForUser(User $user, ?Category $category = null, array $attrs = []): Article
+    {
+        $category ??= $this->createCategory();
+
+        return Article::factory()->create(array_merge([
+            'author_id' => $user->id,
+            'author_type' => $user->getMorphClass(),
+            'category_id' => $category->id,
+        ], $attrs));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function validArticlePayload(?Category $category = null): array
+    {
+        $category ??= $this->createCategory();
+
+        return [
+            'title' => 'Test Article',
+            'content' => 'Article body content.',
+            'cover_image' => 'https://example.com/cover.jpg',
+            'media' => null,
+            'category_id' => $category->id,
+            'is_featured' => true,
+        ];
     }
 
     /**

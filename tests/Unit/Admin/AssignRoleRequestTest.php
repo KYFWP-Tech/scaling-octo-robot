@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\Role;
-use App\Http\Requests\AssignRoleRequest;
+use App\Http\Requests\Admin\AssignRoleRequest;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role as SpatieRole;
 

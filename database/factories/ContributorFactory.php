@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Admin;
+use App\Models\Contributor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Admin>
+ * @extends Factory<Contributor>
  */
-class AdminFactory extends Factory
-{
+class ContributorFactory extends Factory
+{ 
     /**
      * @return array<string, mixed>
      */

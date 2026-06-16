@@ -12,13 +12,13 @@ describe('Permission', function () {
         it('lists permissions for editor', function () {
             $this->actingAsAdmin(Role::Editor);
 
-            $this->getJson(route('permissions.index'))
+            $this->getJson(route('admins.permissions.index'))
                 ->assertOk()
                 ->assertJsonStructure(['data' => [['id', 'name']]]);
         });
 
         it('returns 401 when unauthenticated', function () {
-            $this->getJson(route('permissions.index'))->assertUnauthorized();
+            $this->getJson(route('admins.permissions.index'))->assertUnauthorized();
         });
     });
 
@@ -28,7 +28,7 @@ describe('Permission', function () {
 
             $permission = Permission::where('name', 'admins.index')->first();
 
-            $this->getJson(route('permissions.show', $permission))
+            $this->getJson(route('admins.permissions.show', $permission))
                 ->assertOk()
                 ->assertJsonPath('data.name', 'admins.index');
         });
@@ -43,7 +43,7 @@ describe('Permission', function () {
                 'guard_name' => 'web',
             ]);
 
-            $this->putJson(route('permissions.update', $permission), [
+            $this->putJson(route('admins.permissions.update', $permission), [
                 'name' => 'temp.permission.renamed',
             ])->assertOk()
                 ->assertJsonPath('data.name', 'temp.permission.renamed');
@@ -54,7 +54,7 @@ describe('Permission', function () {
 
             $permission = Permission::where('name', 'admins.index')->first();
 
-            $this->putJson(route('permissions.update', $permission), [
+            $this->putJson(route('admins.permissions.update', $permission), [
                 'name' => 'admins.list',
             ])->assertForbidden();
         });
@@ -67,7 +67,7 @@ describe('Permission', function () {
                 'guard_name' => 'web',
             ]);
 
-            $this->putJson(route('permissions.update', $permission), [
+            $this->putJson(route('admins.permissions.update', $permission), [
                 'name' => 'admins.index',
             ])->assertUnprocessable();
         });
@@ -76,7 +76,7 @@ describe('Permission', function () {
     it('does not allow creating permissions via POST', function () {
         $this->actingAsAdmin(Role::SuperAdmin);
 
-        $this->postJson(route('permissions.index'), [
+        $this->postJson(route('admins.permissions.index'), [
             'name' => 'new.permission',
         ])->assertMethodNotAllowed();
     });

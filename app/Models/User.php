@@ -8,6 +8,7 @@ use App\Traits\VerifyUser;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,6 +56,11 @@ class User extends Authenticatable
             'password' => 'hashed',
             'status' => Status::class,
         ];
+    }
+
+    public function articles(): MorphMany
+    {
+        return $this->morphMany(Article::class, 'author');
     }
 
     public function profile(): MorphTo
