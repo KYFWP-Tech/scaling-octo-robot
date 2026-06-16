@@ -35,6 +35,24 @@ class RolesAndPermissionsSeeder extends Seeder
             'permissions.update',
             'permissions.destroy',
         ],
+        'articles' => [
+            'articles.index',
+            'articles.show',
+            'articles.update',
+            'articles.destroy',
+        ],
+        'categories' => [
+            'categories.index',
+            'categories.show',
+            'categories.store',
+            'categories.update',
+            'categories.destroy',
+        ],
+        'users' => [
+            'users.index',
+            'users.show',
+            'users.update',
+        ],
     ];
 
     public function run(): void
@@ -68,6 +86,18 @@ class RolesAndPermissionsSeeder extends Seeder
             'permissions.index',
             'permissions.show',
             'permissions.update',
+            'articles.index',
+            'articles.show',
+            'articles.update',
+            'articles.destroy',
+            'categories.index',
+            'categories.show',
+            'categories.store',
+            'categories.update',
+            'categories.destroy',
+            'users.index',
+            'users.show',
+            'users.update',
         ])->values());
 
         $editor = SpatieRole::firstOrCreate([
@@ -81,6 +111,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'roles.show',
             'permissions.index',
             'permissions.show',
+            'articles.index',
+            'articles.show',
+            'categories.index',
+            'categories.show',
+            'users.index',
+            'users.show',
         ])->values());
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();

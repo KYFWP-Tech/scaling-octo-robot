@@ -12,13 +12,13 @@ describe('Role', function () {
         it('lists roles for editor', function () {
             $this->actingAsAdmin(Role::Editor);
 
-            $this->getJson(route('roles.index'))
+            $this->getJson(route('admins.roles.index'))
                 ->assertOk()
                 ->assertJsonStructure(['data' => [['id', 'name', 'permissions']]]);
         });
 
         it('returns 401 when unauthenticated', function () {
-            $this->getJson(route('roles.index'))->assertUnauthorized();
+            $this->getJson(route('admins.roles.index'))->assertUnauthorized();
         });
     });
 
@@ -28,7 +28,7 @@ describe('Role', function () {
 
             $role = SpatieRole::where('name', Role::Editor->value)->first();
 
-            $this->getJson(route('roles.show', $role))
+            $this->getJson(route('admins.roles.show', $role))
                 ->assertOk()
                 ->assertJsonPath('data.name', Role::Editor->value);
         });
@@ -40,7 +40,7 @@ describe('Role', function () {
 
             $role = SpatieRole::where('name', Role::Editor->value)->first();
 
-            $this->putJson(route('roles.update', $role), [
+            $this->putJson(route('admins.roles.update', $role), [
                 'permissions' => ['admins.index'],
             ])->assertOk()
                 ->assertJsonPath('data.permissions.0.name', 'admins.index');
@@ -51,7 +51,7 @@ describe('Role', function () {
 
             $role = SpatieRole::where('name', Role::Editor->value)->first();
 
-            $this->putJson(route('roles.update', $role), [
+            $this->putJson(route('admins.roles.update', $role), [
                 'permissions' => ['admins.index'],
             ])->assertForbidden();
         });
@@ -61,7 +61,7 @@ describe('Role', function () {
 
             $role = SpatieRole::where('name', Role::Editor->value)->first();
 
-            $this->putJson(route('roles.update', $role), [
+            $this->putJson(route('admins.roles.update', $role), [
                 'permissions' => ['invalid.permission'],
             ])->assertUnprocessable();
         });
@@ -70,7 +70,7 @@ describe('Role', function () {
     it('does not allow creating roles via POST', function () {
         $this->actingAsAdmin(Role::SuperAdmin);
 
-        $this->postJson(route('roles.index'), [
+        $this->postJson(route('admins.roles.index'), [
             'name' => 'new-role',
         ])->assertMethodNotAllowed();
     });

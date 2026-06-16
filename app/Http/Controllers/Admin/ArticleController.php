@@ -73,7 +73,7 @@ class ArticleController implements HasMiddleware
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $articles = Article::with(['category:id,name,icon', 'author:id,name'])
+        $articles = Article::with(['category:id,name,icon,status', 'author:id,name,status'])
                             ->when($request->has('search'), function ($query) use ($request) {
                                 $query->where('title', 'like', '%'.$request->string('search')->trim().'%');
                             })

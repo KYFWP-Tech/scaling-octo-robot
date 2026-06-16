@@ -2,7 +2,7 @@
 
 use App\Enums\Role;
 use App\Enums\Status;
-use App\Http\Requests\AdminRequest;
+use App\Http\Requests\Admin\AdminRequest;
 use Illuminate\Support\Facades\Validator;
 
 beforeEach(function () {

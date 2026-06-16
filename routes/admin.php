@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::apiResource('admins', AdminController::class);
-
     Route::prefix('admins')->name('admins.')->group(function () {
         Route::apiResource('users', UserController::class)->except(['store']);
         Route::post('accept-invitation', [AdminController::class, 'acceptInvitation'])->name('accept-invitation');
@@ -21,5 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('articles', ArticleController::class)->except(['store']);
         Route::apiResource('categories', CategoryController::class);
     });
+
+    Route::apiResource('admins', AdminController::class);
 
 });

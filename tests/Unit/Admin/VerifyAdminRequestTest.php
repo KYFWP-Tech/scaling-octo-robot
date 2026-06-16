@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\Status;
-use App\Http\Requests\VerifyAdminRequest;
+use App\Http\Requests\Admin\VerifyAdminRequest;
 use App\Models\Verification;
 use Illuminate\Support\Facades\Validator;
 
