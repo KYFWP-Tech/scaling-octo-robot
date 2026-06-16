@@ -10,9 +10,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 /**
- * @group Permission Management
- *
- * APIs for viewing and managing permissions
+ * @tags Permission Management
  */
 class PermissionController implements HasMiddleware
 {

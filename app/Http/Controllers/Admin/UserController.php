@@ -13,6 +13,10 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @tags User Management
+ *
+ */
 class UserController implements HasMiddleware
 {
     public static function middleware(): array

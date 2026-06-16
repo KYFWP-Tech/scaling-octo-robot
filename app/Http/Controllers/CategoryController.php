@@ -6,6 +6,10 @@ use App\Enums\Status;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 
+/**
+ * @tags Public Category Management
+ *
+ */
 class CategoryController extends Controller
 {
     public function index()

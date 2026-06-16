@@ -11,6 +11,10 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
+/**
+ * @tags Admin Category Management
+ *
+ */
 class CategoryController  implements HasMiddleware
 {
     public static function middleware(): array
