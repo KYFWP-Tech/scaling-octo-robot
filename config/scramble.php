@@ -50,11 +50,11 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => '',
+        'description' => 'This documents the backend for the know your faith platform',
     ],
 
     'ui' => [
-        'title' => null,
+        'title' => 'KYFP',
     ],
 
     'renderer' => 'elements',

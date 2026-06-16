@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminRequest;
-use App\Http\Requests\AssignRoleRequest;
+use App\Http\Requests\Admin\AdminRequest;
+use App\Http\Requests\Admin\AssignRoleRequest;
 use App\Http\Requests\UpdateAuthenticatedUserRequest;
-use App\Http\Requests\VerifyAdminRequest;
+use App\Http\Requests\Admin\VerifyAdminRequest;
 use App\Http\Resources\AdminResource;
 use App\Models\Admin;
 use App\Models\Verification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,16 +21,18 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * APIs for managing admin users and handling admin invitations
  */
-class AdminController extends Controller
+class AdminController implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('can:index,'.Admin::class)->only(['index']);
-        $this->middleware('can:store,'.Admin::class)->only(['store']);
-        $this->middleware('can:show,admin')->only(['show']);
-        $this->middleware('can:update,admin')->only(['update']);
-        $this->middleware('can:destroy,admin')->only(['destroy']);
-        $this->middleware('can:assignRole,admin')->only(['assignRole']);
+        return[
+            new Middleware('can:index,'.Admin::class)->only(['index']),
+            new Middleware('can:store,'.Admin::class)->only(['store']),
+            new Middleware('can:show,admin')->only(['show']),
+            new Middleware('can:update,admin')->only(['update']),
+            new Middleware('can:destroy,admin')->only(['destroy']),
+            new Middleware('can:assignRole,admin')->only(['assignRole']),
+        ];
     }
 
     /**
@@ -56,8 +59,8 @@ class AdminController extends Controller
      *    }
      *  ],
      *  "links": {
-     *    "first": "http://example.com/api/v1/admins?page=1",
-     *    "last": "http://example.com/api/v1/admins?page=1",
+     *    "first": "http://example.com/api/admins?page=1",
+     *    "last": "http://example.com/api/admins?page=1",
      *    "prev": null,
      *    "next": null
      *  },
@@ -65,7 +68,7 @@ class AdminController extends Controller
      *    "current_page": 1,
      *    "from": 1,
      *    "last_page": 1,
-     *    "path": "http://example.com/api/v1/admins",
+     *    "path": "http://example.com/api/admins",
      *    "per_page": 15,
      *    "to": 1,
      *    "total": 1
@@ -239,9 +242,7 @@ class AdminController extends Controller
      *
      * @urlParam admin string required The UUID of the admin. Example: 550e8400-e29b-41d4-a716-446655440000
      *
-     * @response 200 {
-     *  "message": "Admin deleted successfully"
-     * }
+     * @response 204 {}
      * @response 404 {
      *  "message": "Admin not found."
      * }
@@ -286,7 +287,7 @@ class AdminController extends Controller
         if ($verification->hasExpired()) {
             return response()->json([
                 'message' => 'This invitation has expired',
-            ], Response::HTTP_BAD_REQUEST);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return DB::transaction(function () use ($verification, $validated) {

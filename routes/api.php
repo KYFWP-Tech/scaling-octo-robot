@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;   
+use App\Http\Controllers\AuthenticatedUserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,3 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 include __DIR__.'/admin.php';
+
+
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::controller(AuthenticatedUserController::class)->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', 'show')->name('show');
+        Route::put('/', 'update')->name('update');
+        Route::delete('/', 'destroy')->name('destroy');
+    });
+});
