@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthenticatedUserController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 include __DIR__.'/admin.php';
-
+include __DIR__.'/contributor.php';
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -25,3 +27,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/', 'destroy')->name('destroy');
     });
 });
+
+Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
+Route::apiResource('categories', CategoryController::class)->only(['index']);
