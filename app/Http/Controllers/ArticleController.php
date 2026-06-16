@@ -8,6 +8,10 @@ use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+/**
+ * @tags Public Article Management
+ *
+ */
 class ArticleController extends Controller
 {
     /**

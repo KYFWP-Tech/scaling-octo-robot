@@ -17,9 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @group Admin Management
+ * @tags Admin Management
  *
- * APIs for managing admin users and handling admin invitations
  */
 class AdminController implements HasMiddleware
 {

@@ -11,6 +11,10 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @tags Contributor Article Management
+ *
+ */
 class ArticleController implements HasMiddleware
 {
     public static function middleware(): array

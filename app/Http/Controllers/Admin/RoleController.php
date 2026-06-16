@@ -10,9 +10,8 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 /**
- * @group Role Management
+ * @tags Role Management
  *
- * APIs for viewing and managing roles
  */
 class RoleController implements HasMiddleware
 {

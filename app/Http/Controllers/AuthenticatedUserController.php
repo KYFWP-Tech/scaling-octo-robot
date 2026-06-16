@@ -10,9 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
- * @group Authenticated User
+ * @tags Authenticated User Management
  *
- * APIs for managing the currently authenticated user's profile
  */
 class AuthenticatedUserController extends Controller
 {

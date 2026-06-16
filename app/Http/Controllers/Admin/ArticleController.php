@@ -12,6 +12,11 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
+
+/**
+ * @tags Admin Article Management
+ *
+ */
 class ArticleController implements HasMiddleware
 {
     public static function middleware(): array
