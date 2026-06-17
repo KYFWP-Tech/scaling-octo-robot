@@ -8,6 +8,7 @@ use App\Traits\VerifyUser;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +62,11 @@ class User extends Authenticatable
     public function articles(): MorphMany
     {
         return $this->morphMany(Article::class, 'author');
+    }
+
+    public function reflections(): HasMany
+    {
+        return $this->hasMany(Reflection::class, 'author_id'); 
     }
 
     public function profile(): MorphTo

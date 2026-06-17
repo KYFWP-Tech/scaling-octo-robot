@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'readings' => [ 
+        'provider' => env('READINGS_PROVIDER', 'Cpbjr'),
+        'base_url' => env('READINGS_BASE_URL', 'https://cpbjr.github.io/catholic-readings-api'),
+    ],
+
+    'bible' => [
+        'provider' => env('BIBLE_PROVIDER', 'BibleApi'),
+        'base_url' => env('BIBLE_BASE_URL', 'https://bible-api.com'),
+        'translation' => env('BIBLE_TRANSLATION', 'web'),
+    ],
+
 ];
