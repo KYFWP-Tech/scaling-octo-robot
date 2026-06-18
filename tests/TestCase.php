@@ -8,10 +8,13 @@ use App\Models\Admin;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Contributor;
+use App\Models\Reflection;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 
 abstract class TestCase extends BaseTestCase
@@ -128,6 +131,88 @@ abstract class TestCase extends BaseTestCase
             'category_id' => $category->id,
             'is_featured' => true,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $attrs
+     */
+    protected function createReflectionForUser(User $user, array $attrs = []): Reflection
+    {
+        return Reflection::factory()->create(array_merge([
+            'author_id' => $user->id,
+        ], $attrs));
+    }
+
+    /**
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    protected function validReflectionPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'date' => '2026-06-17',
+            'title' => 'Test Reflection',
+            'content' => 'Reflection body content.',
+        ], $overrides);
+    }
+
+    protected function fakeReadingsApis(
+        string $date = '2026-06-17',
+        bool $includeCelebration = true,
+        bool $includeSecondReading = false,
+    ): void {
+        $parsed = Carbon::parse($date);
+        $readingsBase = rtrim(config('services.readings.base_url'), '/');
+        $bibleBase = rtrim(config('services.bible.base_url'), '/');
+        $monthDay = $parsed->format('m-d');
+
+        $readings = [
+            'firstReading' => '2 Kings 2:1, 6-14',
+            'psalm' => 'Psalm 31:20, 21, 24',
+            'gospel' => 'Matthew 6:1-6, 16-18',
+        ];
+
+        if ($includeSecondReading) {
+            $readings['secondReading'] = 'Philemon 9-10, 12-17';
+        }
+
+        $passageResponse = [
+            'reference' => 'Test Reference',
+            'text' => 'Test passage text.',
+            'verses' => [
+                [
+                    'book_id' => 'MAT',
+                    'book_name' => 'Matthew',
+                    'chapter' => 6,
+                    'verse' => 1,
+                    'text' => 'Test verse.',
+                ],
+            ],
+        ];
+
+        $fakes = [
+            "{$readingsBase}/readings/{$parsed->year}/{$monthDay}.json" => Http::response([
+                'date' => $date,
+                'monthDay' => $parsed->format('n/j'),
+                'season' => 'Ordinary Time',
+                'readings' => $readings,
+            ]),
+            "{$bibleBase}/*" => Http::response($passageResponse),
+        ];
+
+        $fakes["{$readingsBase}/liturgical-calendar/{$parsed->year}/{$monthDay}.json"] = $includeCelebration
+            ? Http::response([
+                'date' => $date,
+                'celebration' => [
+                    'name' => 'Test Celebration',
+                    'type' => 'FERIA',
+                    'quote' => '',
+                    'description' => 'Test description.',
+                ],
+            ])
+            : Http::response([], 404);
+
+        Http::fake($fakes);
     }
 
     /**
