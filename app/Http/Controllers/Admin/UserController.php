@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * @tags User Management
- *
  */
 class UserController implements HasMiddleware
 {
@@ -29,7 +28,6 @@ class UserController implements HasMiddleware
         ];
     }
 
-
     /**
      * List users
      *
@@ -37,40 +35,6 @@ class UserController implements HasMiddleware
      *
      * @queryParam page integer The page number for pagination. Example: 1
      * @queryParam per_page integer The number of items per page. Example: 15
-     *
-     * @response 200 {
-     *  "data": [
-     *    {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "status": {
-     *        "value": "Active",
-     *        "label": "Active",
-     *      }
-     *    }
-     *  ],
-     *  "links": {
-     *    "first": "http://example.com/api/users?page=1",
-     *    "last": "http://example.com/api/users?page=1",
-     *    "prev": null,
-     *    "next": null
-     *  },
-     *  "meta": {
-     *    "current_page": 1,
-     *    "from": 1,
-     *    "last_page": 1,
-     *    "path": "http://example.com/api/admins/users",
-     *    "per_page": 15,
-     *    "to": 1,
-     *    "total": 1
-     *  }
-     * }
-     * @response 403 {
-     *  "message": "You are not authorized to view users."
-     * }
      */
     public function index(): AnonymousResourceCollection
     {
@@ -79,60 +43,24 @@ class UserController implements HasMiddleware
         return UserResource::collection($users);
     }
 
-      /**
+    /**
      * Get User
      *
      * Get detailed information about a specific user.
      *
      * @urlParam user string required The UUID of the user. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 200 {
-     *  "data": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "status": {
-     *        "value": "Active",
-     *        "label": "Active",
-     *      }
-     *  }
-     * }
-     * @response 404 {
-     *  "message": "User not found."
-     * }
      */
     public function show(User $user): UserResource
     {
         return new UserResource($user);
     }
 
-
-
-      /**
+    /**
      * Update User Status
      *
-     * Update specific user status
+     * Update specific user status.
      *
      * @urlParam user string required The UUID of the user. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 200 {
-     *  "data": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "status": {
-     *        "value": "Active",
-     *        "label": "Active",
-     *      }
-     *  }
-     * }
-     * @response 404 {
-     *  "message": "User not found."
-     * }
      */
     public function update(User $user, ChangeStatusRequest $request): UserResource
     {
@@ -142,18 +70,12 @@ class UserController implements HasMiddleware
         return new UserResource($user);
     }
 
-
     /**
      * Delete User
      *
      * Remove a user from the system.
      *
      * @urlParam user string required The UUID of the user. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 204 {}
-     * @response 404 {
-     *  "message": "User not found."
-     * }
      */
     public function destroy(User $user): JsonResponse
     {

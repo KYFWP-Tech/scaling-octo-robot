@@ -3,6 +3,8 @@
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthenticatedUserController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReadingsController;
+use App\Http\Controllers\ReflectionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,5 +30,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 });
 
-Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
+Route::apiResource('articles', ArticleController::class)->only(['index', 'show'])->whereUuid('article');
 Route::apiResource('categories', CategoryController::class)->only(['index']);
+Route::get('readings/{date}', [ReadingsController::class, 'show'])->name('readings.show');
+Route::get('reflections', [ReflectionController::class, 'index'])->name('reflections.index');
+Route::get('reflections/{date}', [ReflectionController::class, 'show'])->name('reflections.show');

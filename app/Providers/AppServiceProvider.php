@@ -9,6 +9,9 @@ use App\Models\Category;
 use App\Models\Contributor;
 use App\Models\Reader;
 use App\Models\User;
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Auth\SessionGuard;
@@ -67,6 +70,12 @@ class AppServiceProvider extends ServiceProvider
             'reader' => Reader::class,
             'user' => User::class,
         ]);
+
+        Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
+            $openApi->secure(
+                SecurityScheme::http('bearer')
+            );
+        });
 
         Gate::before(fn (User $user, string $ability) => $user->hasRole(AdminRole::SuperAdmin->value) ? true : null);
 
