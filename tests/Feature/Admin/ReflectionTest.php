@@ -164,10 +164,25 @@ describe('Reflection', function () {
         });
     });
 
-    it('does not allow creating reflections via POST on admin routes', function () {
-        $this->actingAsAdmin(Role::SuperAdmin);
+    describe('store', function () {
+        it('creates a reflection for authorized admin', function () {
+            $this->actingAsAdmin(Role::SuperAdmin);
 
-        $this->postJson(route('admins.reflections.index'), $this->validReflectionPayload())
-            ->assertMethodNotAllowed();
+            $payload = $this->validReflectionPayload();
+
+            $this->postJson(route('admins.reflections.store'), $payload)
+                ->assertCreated()
+                ->assertJsonPath('data.title', $payload['title']);
+
+            $this->assertDatabaseHas('reflections', [
+                'title' => $payload['title'],
+                'date' => $payload['date'],
+            ]);
+        });
+
+        it('returns 401 when unauthenticated', function () {
+            $this->postJson(route('admins.reflections.store'), $this->validReflectionPayload())
+                ->assertUnauthorized();
+        });
     });
 });

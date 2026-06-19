@@ -17,37 +17,66 @@ use RuntimeException;
 class ReadingsController extends Controller
 {
     /**
-     * Get daily readings with liturgical context and passage text.
+     * Get daily readings with liturgical context and Bible passage text.
+     *
+     * Liturgical data is fetched from the configured readings provider. Passage text is fetched from the configured Bible provider.
+     * `celebration` may be `null` when liturgical calendar data is unavailable. Memorial celebrations may also include an `image` field.
+     * Any reading without a reference for the day is returned as `null` (commonly `second_reading` on weekdays).
+     *
+     * @urlParam date string required The date in `Y-m-d` format. Example: 2026-06-17
      *
      * @response 200 {
      *  "data": {
      *    "date": "2026-06-17",
      *    "season": "Ordinary Time",
      *    "celebration": {
-     *      "name": "Saint John Bosco, Priest",
-     *      "type": "MEMORIAL",
-     *      "quote": "Run, jump, shout, but do not sin.",
-     *      "description": "The 'Father and Teacher of Youth,' he founded the Salesians...",
-     *      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/..."
+     *      "name": "Wednesday of the 11th week of Ordinary Time",
+     *      "type": "FERIA",
+     *      "quote": "",
+     *      "description": ""
      *    },
      *    "readings": {
      *      "first_reading": {
-     *        "reference": "2 Kings 2:1, 6-14",
-     *        "text": "...",
-     *        "verses": []
+     *        "reference": "2 Kings 2:1,6-14",
+     *        "text": "When Yahweh was about to take Elijah up by a whirlwind into heaven, Elijah went with Elisha from Gilgal.\n",
+     *        "verses": [
+     *          {
+     *            "book_id": "2KI",
+     *            "book_name": "2 Kings",
+     *            "chapter": 2,
+     *            "verse": 1,
+     *            "text": "When Yahweh was about to take Elijah up by a whirlwind into heaven, Elijah went with Elisha from Gilgal.\n"
+     *          }
+     *        ]
      *      },
      *      "psalm": {
-     *        "reference": "Psalm 31:20, 21, 24",
-     *        "text": "...",
-     *        "verses": []
+     *        "reference": "Psalms 31:20,21,24",
+     *        "text": "In the shelter of your presence you will hide them from the plotting of man.\n",
+     *        "verses": [
+     *          {
+     *            "book_id": "PSA",
+     *            "book_name": "Psalms",
+     *            "chapter": 31,
+     *            "verse": 20,
+     *            "text": "In the shelter of your presence you will hide them from the plotting of man.\n"
+     *          }
+     *        ]
      *      },
      *      "second_reading": null,
      *      "gospel": {
-     *        "reference": "Matthew 6:1-6, 16-18",
-     *        "text": "...",
-     *        "verses": []
+     *        "reference": "Matthew 6:1-6,16-18",
+     *        "text": "Be careful that you don't do your charitable giving before men, to be seen by them, or else you have no reward from your Father who is in heaven.\n",
+     *        "verses": [
+     *          {
+     *            "book_id": "MAT",
+     *            "book_name": "Matthew",
+     *            "chapter": 6,
+     *            "verse": 1,
+     *            "text": "Be careful that you don't do your charitable giving before men, to be seen by them, or else you have no reward from your Father who is in heaven.\n"
+     *          }
+     *        ]
      *      }
-     *    },
+     *    }
      *  }
      * }
      * @response 422 {
