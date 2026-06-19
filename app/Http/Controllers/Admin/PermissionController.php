@@ -25,20 +25,6 @@ class PermissionController implements HasMiddleware
 
     /**
      * List permissions.
-     *
-     * @response 200 {
-     *  "data": [
-     *    {
-     *      "id": 1,
-     *      "name": "articles.index",
-     *      "createdAt": "2026-01-01T00:00:00.000000Z",
-     *      "updatedAt": "2026-01-01T00:00:00.000000Z"
-     *    }
-     *  ]
-     * }
-     * @response 401 {
-     *  "message": "Unauthenticated."
-     * }
      */
     public function index(): AnonymousResourceCollection
     {
@@ -51,21 +37,6 @@ class PermissionController implements HasMiddleware
      * Get the specified permission.
      *
      * @urlParam permission integer required The ID of the permission. Example: 1
-     *
-     * @response 200 {
-     *  "data": {
-     *    "id": 1,
-     *    "name": "articles.index",
-     *    "createdAt": "2026-01-01T00:00:00.000000Z",
-     *    "updatedAt": "2026-01-01T00:00:00.000000Z"
-     *  }
-     * }
-     * @response 401 {
-     *  "message": "Unauthenticated."
-     * }
-     * @response 404 {
-     *  "message": "No query results for model [App\\Models\\Permission] 99"
-     * }
      */
     public function show(Permission $permission): PermissionResource
     {
@@ -77,27 +48,6 @@ class PermissionController implements HasMiddleware
      *
      * @urlParam permission integer required The ID of the permission. Example: 1
      * @bodyParam name string required The permission name. Must be unique except for this permission. Example: articles.index
-     *
-     * @response 200 {
-     *  "data": {
-     *    "id": 1,
-     *    "name": "articles.index",
-     *    "createdAt": "2026-01-01T00:00:00.000000Z",
-     *    "updatedAt": "2026-01-01T00:00:00.000000Z"
-     *  }
-     * }
-     * @response 401 {
-     *  "message": "Unauthenticated."
-     * }
-     * @response 403 {
-     *  "message": "This action is unauthorized."
-     * }
-     * @response 422 {
-     *  "message": "The name has already been taken.",
-     *  "errors": {
-     *    "name": ["The name has already been taken."]
-     *  }
-     * }
      */
     public function update(UpdatePermissionRequest $request, Permission $permission): PermissionResource
     {

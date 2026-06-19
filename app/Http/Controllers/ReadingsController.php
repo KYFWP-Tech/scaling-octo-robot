@@ -7,7 +7,6 @@ use App\Services\Bible\Bible;
 use App\Services\Readings\Readings;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use RuntimeException;
 
@@ -24,69 +23,8 @@ class ReadingsController extends Controller
      * Any reading without a reference for the day is returned as `null` (commonly `second_reading` on weekdays).
      *
      * @urlParam date string required The date in `Y-m-d` format. Example: 2026-06-17
-     *
-     * @response 200 {
-     *  "data": {
-     *    "date": "2026-06-17",
-     *    "season": "Ordinary Time",
-     *    "celebration": {
-     *      "name": "Wednesday of the 11th week of Ordinary Time",
-     *      "type": "FERIA",
-     *      "quote": "",
-     *      "description": ""
-     *    },
-     *    "readings": {
-     *      "first_reading": {
-     *        "reference": "2 Kings 2:1,6-14",
-     *        "text": "When Yahweh was about to take Elijah up by a whirlwind into heaven, Elijah went with Elisha from Gilgal.\n",
-     *        "verses": [
-     *          {
-     *            "book_id": "2KI",
-     *            "book_name": "2 Kings",
-     *            "chapter": 2,
-     *            "verse": 1,
-     *            "text": "When Yahweh was about to take Elijah up by a whirlwind into heaven, Elijah went with Elisha from Gilgal.\n"
-     *          }
-     *        ]
-     *      },
-     *      "psalm": {
-     *        "reference": "Psalms 31:20,21,24",
-     *        "text": "In the shelter of your presence you will hide them from the plotting of man.\n",
-     *        "verses": [
-     *          {
-     *            "book_id": "PSA",
-     *            "book_name": "Psalms",
-     *            "chapter": 31,
-     *            "verse": 20,
-     *            "text": "In the shelter of your presence you will hide them from the plotting of man.\n"
-     *          }
-     *        ]
-     *      },
-     *      "second_reading": null,
-     *      "gospel": {
-     *        "reference": "Matthew 6:1-6,16-18",
-     *        "text": "Be careful that you don't do your charitable giving before men, to be seen by them, or else you have no reward from your Father who is in heaven.\n",
-     *        "verses": [
-     *          {
-     *            "book_id": "MAT",
-     *            "book_name": "Matthew",
-     *            "chapter": 6,
-     *            "verse": 1,
-     *            "text": "Be careful that you don't do your charitable giving before men, to be seen by them, or else you have no reward from your Father who is in heaven.\n"
-     *          }
-     *        ]
-     *      }
-     *    }
-     *  }
-     * }
-     * @response 422 {
-     *  "message": "Invalid date format. Expected Y-m-d."
-     * }
-     * @response 404 {
-     *  "message": "Readings data not found for date [2020-01-01]."
-     * }
      */
-    public function show(string $date): JsonResponse|ReadingsResource
+    public function show(string $date): ReadingsResource
     {
         $parsedDate = $this->parseDate($date);
 

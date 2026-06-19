@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @tags Admin Management
- *
  */
 class AdminController implements HasMiddleware
 {
@@ -41,41 +40,6 @@ class AdminController implements HasMiddleware
      *
      * @queryParam page integer The page number for pagination. Example: 1
      * @queryParam per_page integer The number of items per page. Example: 15
-     *
-     * @response 200 {
-     *  "data": [
-     *    {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "user": {
-     *        "id": "550e8400-e29b-41d4-a716-446655440001",
-     *        "email": "john@example.com",
-     *        "email_verified_at": "2024-03-24T12:00:00.000000Z",
-     *      }
-     *    }
-     *  ],
-     *  "links": {
-     *    "first": "http://example.com/api/admins?page=1",
-     *    "last": "http://example.com/api/admins?page=1",
-     *    "prev": null,
-     *    "next": null
-     *  },
-     *  "meta": {
-     *    "current_page": 1,
-     *    "from": 1,
-     *    "last_page": 1,
-     *    "path": "http://example.com/api/admins",
-     *    "per_page": 15,
-     *    "to": 1,
-     *    "total": 1
-     *  }
-     * }
-     * @response 403 {
-     *  "message": "You are not authorized to view admin users."
-     * }
      */
     public function index(): AnonymousResourceCollection
     {
@@ -90,24 +54,6 @@ class AdminController implements HasMiddleware
      * Get detailed information about a specific admin user.
      *
      * @urlParam admin string required The UUID of the admin. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 200 {
-     *  "data": {
-     *    "id": "550e8400-e29b-41d4-a716-446655440000",
-     *    "name": "John Doe",
-     *    "email": "john@example.com",
-     *    "created_at": "2024-03-24T12:00:00.000000Z",
-     *    "updated_at": "2024-03-24T12:00:00.000000Z",
-     *    "user": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440001",
-     *      "email": "john@example.com",
-     *      "email_verified_at": "2024-03-24T12:00:00.000000Z",
-     *    }
-     *  }
-     * }
-     * @response 404 {
-     *  "message": "Admin not found."
-     * }
      */
     public function show(Admin $admin): AdminResource
     {
@@ -121,28 +67,6 @@ class AdminController implements HasMiddleware
      *
      * @bodyParam name string required The name of the admin. Example: John Doe
      * @bodyParam email string required The email address of the admin. Must be unique. Example: john@example.com
-     *
-     * @response 201 {
-     *  "message": "Admin invitation sent successfully",
-     *  "data": {
-     *    "id": "550e8400-e29b-41d4-a716-446655440000",
-     *    "name": "John Doe",
-     *    "email": "john@example.com",
-     *    "created_at": "2024-03-24T12:00:00.000000Z",
-     *    "updated_at": "2024-03-24T12:00:00.000000Z",
-     *    "user": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440001",
-     *      "email": "john@example.com",
-     *      "email_verified_at": null,
-     *    }
-     *  }
-     * }
-     * @response 422 {
-     *  "message": "The given data was invalid.",
-     *  "errors": {
-     *    "email": ["The email has already been taken."],
-     *  }
-     * }
      */
     public function store(AdminRequest $request): AdminResource
     {
@@ -155,6 +79,7 @@ class AdminController implements HasMiddleware
             ]);
             $admin->makeUser(['status' => $validated['status']]);
 
+            /** @status 201 */
             return new AdminResource($admin->load('user'));
         });
     }
@@ -168,31 +93,6 @@ class AdminController implements HasMiddleware
      *
      * @bodyParam name string optional The name of the admin. Example: John Doe
      * @bodyParam email string optional The email address of the admin. Must be unique. Example: john@example.com
-     *
-     * @response 200 {
-     *  "message": "Admin updated successfully",
-     *  "data": {
-     *    "id": "550e8400-e29b-41d4-a716-446655440000",
-     *    "name": "John Doe",
-     *    "email": "john@example.com",
-     *    "created_at": "2024-03-24T12:00:00.000000Z",
-     *    "updated_at": "2024-03-24T12:00:00.000000Z",
-     *    "user": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440001",
-     *      "email": "john@example.com",
-     *      "email_verified_at": "2024-03-24T12:00:00.000000Z",
-     *    }
-     *  }
-     * }
-     * @response 404 {
-     *  "message": "Admin not found."
-     * }
-     * @response 422 {
-     *  "message": "The given data was invalid.",
-     *  "errors": {
-     *    "email": ["The email has already been taken."],
-     *  }
-     * }
      */
     public function update(UpdateAuthenticatedUserRequest $request, Admin $admin): AdminResource
     {
@@ -240,11 +140,6 @@ class AdminController implements HasMiddleware
      * Remove an admin user from the system.
      *
      * @urlParam admin string required The UUID of the admin. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 204 {}
-     * @response 404 {
-     *  "message": "Admin not found."
-     * }
      */
     public function destroy(Admin $admin): JsonResponse
     {
@@ -264,19 +159,6 @@ class AdminController implements HasMiddleware
      * @bodyParam code string required The verification code from the invitation email. Example: 550e8400-e29b-41d4-a716-446655440000
      * @bodyParam password string required The new password for the account. Must be at least 8 characters. Example: password123
      * @bodyParam password_confirmation string required The password confirmation. Must match the password. Example: password123
-     *
-     * @response 200 {
-     *  "message": "Account setup completed successfully"
-     * }
-     * @response 404 {
-     *  "message": "Invalid or expired verification code."
-     * }
-     * @response 422 {
-     *  "message": "The given data was invalid.",
-     *  "errors": {
-     *    "password": ["The password confirmation does not match."]
-     *  }
-     * }
      */
     public function acceptInvitation(VerifyAdminRequest $request): AdminResource|JsonResponse
     {

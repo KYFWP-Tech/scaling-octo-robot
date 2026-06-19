@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateAuthenticatedUserRequest;
 use App\Http\Resources\UserResource;
 use App\Jobs\DeleteUserAccountJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
  * @tags Authenticated User Management
- *
  */
 class AuthenticatedUserController extends Controller
 {
@@ -19,32 +18,10 @@ class AuthenticatedUserController extends Controller
      * Get Authenticated User
      *
      * Retrieve the profile information for the currently authenticated user.
-     *
-     * @response 200 {
-     *  "data": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "status": {
-     *        "value": "Active",
-     *        "label": "Active",
-     *      }
-     *  }
-     * }
-     *
-     * @response 401 {
-     *   "message": "Unauthenticated."
-     * }
-     *
-     * @apiResource App\Http\Resources\UserResource
      */
-    public function show()
+    public function show(): UserResource
     {
-        $user = Auth::user();
-
-        return new UserResource($user);
+        return new UserResource(Auth::user());
     }
 
     /**
@@ -54,41 +31,12 @@ class AuthenticatedUserController extends Controller
      *
      * @bodyParam name string optional The name of the user. Example: John
      * @bodyParam email string optional The email of the user. Must be unique. Example: john.smith@example.com
-     *
-     *
-     * @response 200 {
-     *  "data": {
-     *      "id": "550e8400-e29b-41d4-a716-446655440000",
-     *      "name": "John Doe",
-     *      "email": "john@example.com",
-     *      "created_at": "2024-03-24T12:00:00.000000Z",
-     *      "updated_at": "2024-03-24T12:00:00.000000Z",
-     *      "status": {
-     *        "value": "Active",
-     *        "label": "Active",
-     *      }
-     *  }
-     * }
-     *
-     * @response 401 {
-     *   "message": "Unauthenticated."
-     * }
-     *
-     * @response 422 {
-     *   "message": "The given data was invalid.",
-     *   "errors": {
-     *     "email": [
-     *       "The email has already been taken."
-     *     ]
-     *   }
-     * }
-     *
-     * @apiResource App\Http\Resources\UserResource
      */
-    public function update(UpdateAuthenticatedUserRequest $request)
+    public function update(UpdateAuthenticatedUserRequest $request): UserResource
     {
         $validated = $request->validated();
         $user = Auth::user();
+
         DB::transaction(function () use ($user, $validated) {
             $user->update($validated);
             $user->profile->update($validated);
@@ -101,16 +49,8 @@ class AuthenticatedUserController extends Controller
      * Delete Authenticated User
      *
      * Permanently delete the authenticated user's account.
-     *
-     * @response 202 {
-     *   "message": "Account deletion has started. Your account and related data will be permanently removed shortly."
-     * }
-     *
-     * @response 401 {
-     *   "message": "Unauthenticated."
-     * }
      */
-    public function destroy()
+    public function destroy(): JsonResponse
     {
         $user = Auth::user();
         DeleteUserAccountJob::dispatch($user);
@@ -120,5 +60,4 @@ class AuthenticatedUserController extends Controller
             'message' => 'Account deletion has started. Your account and related data will be permanently removed shortly.',
         ], 202);
     }
-
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -13,9 +14,8 @@ use Illuminate\Routing\Controllers\Middleware;
 
 /**
  * @tags Admin Category Management
- *
  */
-class CategoryController  implements HasMiddleware
+class CategoryController implements HasMiddleware
 {
     public static function middleware(): array
     {
@@ -34,50 +34,17 @@ class CategoryController  implements HasMiddleware
      * Get a list of all active categories.
      *
      * @queryParam search string Optional. Search in both name and description. Example: electronics
-     *
-     * @response 200 {
-     *  "data": [
-     *    {
-     *      "id": 1,
-     *      "name": "Theology",
-     *      "description": "The study of God and the nature of religion",
-     *      "icon": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>",
-     *      "status": 1,
-     *      "created_at": "2023-04-24T04:31:25.000000Z",
-     *      "updated_at": "2023-04-24T04:31:25.000000Z"
-     *    },
-     *    ...
-     *  ],
-     *  "links": {
-     *    "first": "http://localhost/api/categories?page=1",
-     *    "last": "http://localhost/api/categories?page=1",
-     *    "prev": null,
-     *    "next": null
-     *  },
-     *  "meta": {
-     *    "current_page": 1,
-     *    "from": 1,
-     *    "last_page": 1,
-     *    "path": "http://localhost/api/categories",
-     *    "per_page": 10,
-     *    "to": 10,
-     *    "total": 10
-     *  }
-     * }
-     *
-     * @apiResource App\Http\Resources\CategoryResource
-     * @apiResourceCollection App\Http\Resources\CategoryResource
      */
     public function index(Request $request): AnonymousResourceCollection
     {
         $searchTerm = $request->search;
-        $categories = Category::when($searchTerm, function($query) use ($searchTerm) {
-                $query->where(function($query) use ($searchTerm) {
-                    $query->where('name', 'like', '%' . $searchTerm . '%')
-                          ->orWhere('description', 'like', '%' . $searchTerm . '%');
-                });
-            })
-            ->when($request->has('status') && !empty($request->status), function($query) use ($request) {
+        $categories = Category::when($searchTerm, function ($query) use ($searchTerm) {
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'like', '%'.$searchTerm.'%')
+                    ->orWhere('description', 'like', '%'.$searchTerm.'%');
+            });
+        })
+            ->when($request->has('status') && ! empty($request->status), function ($query) use ($request) {
                 $query->where('status', $request->status);
             })
             ->orderBy('created_at', 'desc')
@@ -92,27 +59,8 @@ class CategoryController  implements HasMiddleware
      * Get detailed information about a specific category.
      *
      * @urlParam category integer required The ID of the category. Example: 1
-     *
-     * @response 200 {
-     *  "data": {
-     *    "id": 1,
-     *    "name": "Theology",
-     *    "description": "The study of God and the nature of religion",
-     *    "icon": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>",
-     *    "status": 1,
-     *    "created_at": "2023-04-24T04:31:25.000000Z",
-     *    "updated_at": "2023-04-24T04:31:25.000000Z"
-     *  }
-     * }
-     *
-     * @response 404 {
-     *  "error": true,
-     *  "message": "Category not found."
-     * }
-     *
-     * @apiResource App\Http\Resources\CategoryResource
      */
-    public function show(Category $category)
+    public function show(Category $category): CategoryResource
     {
         return new CategoryResource($category);
     }
@@ -126,35 +74,12 @@ class CategoryController  implements HasMiddleware
      * @bodyParam description string required The description of the category. Example: Electronic devices and gadgets
      * @bodyParam icon string required The icon identifier for the category. Example: devices
      * @bodyParam status integer required The status of the category (0 for inactive, 1 for active). Example: 1
-     *
-     * @response 201 {
-     *  "data": {
-     *    "id": 1,
-     *    "name": "Theology",
-     *    "description": "The study of God and the nature of religion",
-     *    "icon": "<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>",
-     *    "status": 1,
-     *    "created_at": "2023-04-24T04:31:25.000000Z",
-     *    "updated_at": "2023-04-24T04:31:25.000000Z"
-     *  }
-     * }
-     *
-     * @response 422 {
-     *  "error": true,
-     *  "message": "The given data was invalid.",
-     *  "errors": {
-     *    "name": ["The name field is required."],
-     *    "description": ["The description field is required."],
-     *    "icon": ["The icon field is required."],
-     *    "status": ["The status field must be 0 or 1."]
-     *  }
-     * }
-     *
-     * @apiResource App\Http\Resources\CategoryResource
      */
-    public function store(CategoryRequest $request)
+    public function store(CategoryRequest $request): CategoryResource
     {
         $category = Category::create($request->validated());
+
+        /** @status 201 */
         return new CategoryResource($category);
     }
 
@@ -166,39 +91,13 @@ class CategoryController  implements HasMiddleware
      * @urlParam category integer required The ID of the category. Example: 1
      * @bodyParam name string optional The name of the category. Example: Theology
      * @bodyParam description string optional The description of the category. Example: The study of God and the nature of religion
-     * @bodyParam icon string optional The icon identifier for the category. Example: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+     * @bodyParam icon string optional The icon identifier for the category.
      * @bodyParam status integer optional The status of the category (0 for inactive, 1 for active). Example: 1
-     *
-     * @response 200 {
-     *  "data": {
-     *    "id": 1,
-     *    "name": "Electronics",
-     *    "description": "Electronic devices and gadgets",
-     *    "icon": "devices",
-     *    "status": 1,
-     *    "created_at": "2023-04-24T04:31:25.000000Z",
-     *    "updated_at": "2023-04-24T04:31:25.000000Z"
-     *  }
-     * }
-     *
-     * @response 404 {
-     *  "error": true,
-     *  "message": "Category not found."
-     * }
-     *
-     * @response 422 {
-     *  "error": true,
-     *  "message": "The given data was invalid.",
-     *  "errors": {
-     *    "status": ["The status field must be 0 or 1."]
-     *  }
-     * }
-     *
-     * @apiResource App\Http\Resources\CategoryResource
      */
-    public function update(CategoryRequest $request, Category $category)
+    public function update(CategoryRequest $request, Category $category): CategoryResource
     {
         $category->update($request->validated());
+
         return new CategoryResource($category);
     }
 
@@ -206,17 +105,11 @@ class CategoryController  implements HasMiddleware
      * Delete Category
      *
      * @urlParam category integer required The ID of the category. Example: 1
-     *
-     * @response 204 {}
-     *
-     * @response 404 {
-     *  "error": true,
-     *  "message": "Category not found."
-     * }
      */
-    public function destroy(Category $category)
+    public function destroy(Category $category): JsonResponse
     {
         $category->delete();
+
         return response()->json([], Response::HTTP_NO_CONTENT);
     }
 }
