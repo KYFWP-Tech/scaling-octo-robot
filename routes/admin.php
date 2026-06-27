@@ -3,7 +3,9 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\EpisodeController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\PodcastController;
 use App\Http\Controllers\Admin\ReflectionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -18,6 +20,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('roles', RoleController::class)->except(['store', 'destroy']);
         Route::apiResource('permissions', PermissionController::class)->except(['store', 'destroy']);
         Route::apiResource('articles', ArticleController::class)->except(['store'])->whereUuid('article');
+        Route::apiResource('podcasts', PodcastController::class)->except(['store'])->whereUuid('podcast');
+        Route::apiResource('podcasts.episodes', EpisodeController::class)->except(['store'])->shallow()->whereUuid(['podcast', 'episode']);
         Route::apiResource('reflections', ReflectionController::class)->whereUuid('reflection');
         Route::apiResource('categories', CategoryController::class)->whereUuid('category');
     });

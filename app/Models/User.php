@@ -9,7 +9,6 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,18 +54,23 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'status' => Status::class,
+            'status' => Status::class, 
         ];
     }
 
-    public function articles(): MorphMany
+    public function articles(): HasMany
     {
-        return $this->morphMany(Article::class, 'author');
+        return $this->hasMany(Article::class);
+    }
+
+    public function podcasts(): HasMany
+    {
+        return $this->hasMany(Podcast::class);
     }
 
     public function reflections(): HasMany
     {
-        return $this->hasMany(Reflection::class, 'author_id'); 
+        return $this->hasMany(Reflection::class, 'author_id');
     }
 
     public function profile(): MorphTo

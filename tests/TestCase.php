@@ -111,8 +111,7 @@ abstract class TestCase extends BaseTestCase
         $category ??= $this->createCategory();
 
         return Article::factory()->create(array_merge([
-            'author_id' => $user->id,
-            'author_type' => $user->getMorphClass(),
+            'user_id' => $user->id,
             'category_id' => $category->id,
         ], $attrs));
     }
