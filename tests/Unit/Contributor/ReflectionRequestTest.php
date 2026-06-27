@@ -17,6 +17,48 @@ describe('ReflectionRequest', function () {
         expect($validator->passes())->toBeTrue();
     });
 
+    it('passes with valid file path', function () {
+        $request = $this->createFormRequest(
+            ReflectionRequest::class,
+            'contributors.reflections.store',
+            'POST',
+        );
+
+        $validator = Validator::make($this->validReflectionPayload([
+            'file' => 'reflections/test.mp3',
+        ]), $request->rules());
+
+        expect($validator->passes())->toBeTrue();
+    });
+
+    it('fails when file has invalid extension', function () {
+        $request = $this->createFormRequest(
+            ReflectionRequest::class,
+            'contributors.reflections.store',
+            'POST',
+        );
+
+        $validator = Validator::make($this->validReflectionPayload([
+            'file' => 'reflections/test.jpg',
+        ]), $request->rules());
+
+        expect($validator->fails())->toBeTrue();
+    });
+
+    it('fails when file key is present but empty', function () {
+        $request = $this->createFormRequest(
+            ReflectionRequest::class,
+            'contributors.reflections.store',
+            'POST',
+        );
+
+        $validator = Validator::make($this->validReflectionPayload([
+            'file' => '',
+        ]), $request->rules());
+
+        expect($validator->fails())->toBeTrue();
+    });
+
     it('fails when :dataset', function (array $payload) {
         $request = $this->createFormRequest(
             ReflectionRequest::class,

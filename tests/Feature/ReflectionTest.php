@@ -2,9 +2,11 @@
 
 use App\Models\Reflection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 describe('Reflection', function () {
     beforeEach(function () {
+        Storage::fake('s3');
         Cache::flush();
     });
 
@@ -63,6 +65,21 @@ describe('Reflection', function () {
             Reflection::factory()->create(['date' => '2026-06-17']);
 
             $this->getJson(route('reflections.show', '2026-06-17'))->assertOk();
+        });
+
+        it('includes signed file url when reflection has audio', function () {
+            Storage::fake('s3');
+            $filePath = 'reflections/public-audio.mp3';
+            Storage::disk('s3')->put($filePath, 'content');
+
+            Reflection::factory()->create([
+                'date' => '2026-06-17',
+                'file' => $filePath,
+            ]);
+
+            $this->getJson(route('reflections.show', '2026-06-17'))
+                ->assertOk()
+                ->assertJsonPath('data.file', fn ($url) => is_string($url) && $url !== '');
         });
     });
 });

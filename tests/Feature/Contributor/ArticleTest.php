@@ -2,9 +2,14 @@
 
 use App\Enums\Status;
 use App\Models\Article;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 
 describe('Article', function () {
+    beforeEach(function () {
+        Storage::fake('s3');
+    });
+
     describe('index', function () {
         it('returns only own articles', function () {
             ['user' => $user] = $this->createContributorWithUser();
@@ -45,6 +50,39 @@ describe('Article', function () {
 
             $this->postJson(route('contributors.articles.store'), [])
                 ->assertUnprocessable();
+        });
+
+        it('returns 422 when a media path does not exist', function () {
+            Storage::fake('s3');
+            $this->actingAsContributor();
+
+            $payload = array_merge($this->validArticlePayload(), [
+                'media' => [
+                    ['type' => 'image', 'path' => 'articles/missing.jpg'],
+                ],
+            ]);
+
+            $this->postJson(route('contributors.articles.store'), $payload)
+                ->assertUnprocessable()
+                ->assertJson([
+                    'errors' => [
+                        'media.0.path' => ['The selected media file does not exist.'],
+                    ],
+                ]);
+        });
+
+        it('creates an article with valid media paths', function () {
+            $media = $this->fakeArticleMediaOnStorage(['articles/valid.jpg']);
+            $this->actingAsContributor();
+
+            $payload = array_merge($this->validArticlePayload(), [
+                'media' => $media,
+            ]);
+
+            $this->postJson(route('contributors.articles.store'), $payload)
+                ->assertCreated()
+                ->assertJsonPath('data.media.0.type', 'image')
+                ->assertJsonPath('data.media.0.url', fn ($url) => is_string($url) && $url !== '');
         });
 
         it('returns 401 when unauthenticated', function () {

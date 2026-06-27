@@ -27,6 +27,12 @@ class ReflectionRequest extends FormRequest
             ],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'file' => [
+                'sometimes',
+                'required',
+                'string',
+                'regex:/\.(mp3|wav|m4a|ogg|aac|webm)$/i',
+            ],
         ];
     }
 }

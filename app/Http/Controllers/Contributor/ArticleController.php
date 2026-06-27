@@ -39,13 +39,18 @@ class ArticleController implements HasMiddleware
     /**
      * Store a newly created article for the contributor.
      */
-    public function store(ArticleRequest $request): ArticleResource
+    public function store(ArticleRequest $request): ArticleResource|JsonResponse
     {
         $article = new Article();
+
+        if ($error = $article->validateAssets($request, $article)) {
+            return $error;
+        }
+
         $article->title = $request->string('title')->trim();
         $article->content = $request->string('content')->trim();
-        $article->cover_image = $request->string('cover_image');
-        $article->media = $request->string('media');
+        $article->cover_image = $request->input('cover_image');
+        $article->media = $request->input('media');
         $article->category_id = $request->category_id;
         $article->is_featured = $request->boolean('is_featured');
         $article->status = Status::INACTIVE->value;
@@ -68,12 +73,16 @@ class ArticleController implements HasMiddleware
     /**
      * Update the specified article for the contributor.
      */
-    public function update(ArticleRequest $request, Article $article): ArticleResource
+    public function update(ArticleRequest $request, Article $article): ArticleResource|JsonResponse
     {
+        if ($error = $article->validateAssets($request, $article)) {
+            return $error;
+        }
+
         $article->title = $request->string('title')->trim();
         $article->content = $request->string('content')->trim();
-        $article->cover_image = $request->string('cover_image');
-        $article->media = $request->string('media');
+        $article->cover_image = $request->input('cover_image', $article->cover_image);
+        $article->media = $request->input('media', $article->media);
         $article->category_id = $request->category_id;
         $article->is_featured = $request->boolean('is_featured');
         $article->save();

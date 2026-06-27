@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Traits\HasMedia;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Article extends Model
 {
-    use HasUuids, HasFactory, Sluggable;
+    use HasMedia, HasUuids, HasFactory, Sluggable;
+
+    public const MEDIA_STORAGE_PREFIX = 'articles';
 
     protected $fillable = [
         'title',
@@ -33,6 +36,7 @@ class Article extends Model
     protected $casts = [
         'is_featured' => 'boolean',
         'published_at' => 'datetime',
+        'media' => 'array',
         'status' => Status::class,
     ];
 

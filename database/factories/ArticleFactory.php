@@ -22,8 +22,8 @@ class ArticleFactory extends Factory
         return [
             'title' => fake()->sentence(),
             'content' => fake()->paragraphs(3, true),
-            'cover_image' => fake()->optional()->imageUrl(),
-            'media' => null,
+            'cover_image' => null,
+            'media' => [],
             'category_id' => Category::factory(),
             'status' => Status::INACTIVE,
             'is_featured' => false,

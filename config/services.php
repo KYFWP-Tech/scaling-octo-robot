@@ -46,4 +46,9 @@ return [
         'translation' => env('BIBLE_TRANSLATION', 'web'),
     ],
 
+    'media' => [
+        'disk' => env('MEDIA_DISK', 's3'),
+        'url_ttl' => (int) env('MEDIA_URL_TTL', 60),
+    ],
+
 ];
