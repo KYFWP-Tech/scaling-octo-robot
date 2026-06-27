@@ -2,10 +2,12 @@
 
 use App\Models\Reflection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 
 describe('Reflection', function () {
     beforeEach(function () {
+        Storage::fake('s3');
         Cache::flush();
     });
 
@@ -75,6 +77,32 @@ describe('Reflection', function () {
         it('returns 401 when unauthenticated', function () {
             $this->postJson(route('contributors.reflections.store'), [])
                 ->assertUnauthorized();
+        });
+
+        it('creates a reflection with a valid audio file path', function () {
+            $filePath = $this->fakeReflectionFileOnStorage();
+            $this->actingAsContributor();
+            $payload = $this->validReflectionPayload(['file' => $filePath]);
+
+            $this->postJson(route('contributors.reflections.store'), $payload)
+                ->assertCreated()
+                ->assertJsonPath('data.file', fn ($url) => is_string($url) && $url !== '');
+
+            $this->assertDatabaseHas('reflections', [
+                'title' => $payload['title'],
+                'file' => $filePath,
+            ]);
+        });
+
+        it('returns 422 when audio file path does not exist on storage', function () {
+            Storage::fake('s3');
+            $this->actingAsContributor();
+
+            $this->postJson(route('contributors.reflections.store'), $this->validReflectionPayload([
+                'file' => 'reflections/missing.mp3',
+            ]))
+                ->assertUnprocessable()
+                ->assertJsonPath('errors.file.0', 'The selected audio file does not exist.');
         });
     });
 

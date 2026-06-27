@@ -68,15 +68,23 @@ class ReflectionController implements HasMiddleware
      * @bodyParam date string required The reflection date in `Y-m-d` format. Must be unique. Example: 2026-06-17
      * @bodyParam title string required The reflection title. Example: Daily Reflection
      * @bodyParam content string required The reflection body text. Example: Today we reflect on the gospel reading.
+     * @bodyParam file string optional Audio storage path (mp3, wav, m4a, ogg, aac, webm). Only validated when sent. Example: reflections/audio.mp3
      */
-    public function store(ReflectionRequest $request): ReflectionResource
+    public function store(ReflectionRequest $request): ReflectionResource|JsonResponse
     {
-        $reflection = Reflection::create([
-            'date' => $request->date,
-            'title' => $request->string('title')->trim(),
-            'content' => $request->string('content')->trim(),
-            'author_id' => Auth::id(),
-        ]);
+        $reflection = new Reflection();
+
+        if ($error = $reflection->validateAssets($request, $reflection)) {
+            return $error;
+        }
+
+        $reflection->date = $request->date;
+        $reflection->title = $request->string('title')->trim();
+        $reflection->content = $request->string('content')->trim();
+        $reflection->author_id = Auth::id();
+        $reflection->file = $request->input('file');
+
+        $reflection->save();
 
         $this->forgetCache($reflection->date->toDateString());
 
@@ -91,16 +99,21 @@ class ReflectionController implements HasMiddleware
      * @bodyParam date string required The reflection date in `Y-m-d` format. Must be unique except for this reflection. Example: 2026-06-17
      * @bodyParam title string required The reflection title. Example: Updated Reflection
      * @bodyParam content string required The reflection body text. Example: Updated reflection content.
+     * @bodyParam file string optional Audio storage path (mp3, wav, m4a, ogg, aac, webm). Only validated when sent. Example: reflections/audio.mp3
      */
-    public function update(ReflectionRequest $request, Reflection $reflection): ReflectionResource
+    public function update(ReflectionRequest $request, Reflection $reflection): ReflectionResource|JsonResponse
     {
+        if ($error = $reflection->validateAssets($request, $reflection)) {
+            return $error;
+        }
+
         $previousDate = $reflection->date->toDateString();
 
-        $reflection->update([
-            'date' => $request->date,
-            'title' => $request->string('title')->trim(),
-            'content' => $request->string('content')->trim(),
-        ]);
+        $reflection->date = $request->date;
+        $reflection->title = $request->string('title')->trim();
+        $reflection->content = $request->string('content')->trim();
+        $reflection->file = $request->input('file', $reflection->file);
+        $reflection->save();
 
         $this->forgetCache($previousDate);
         $this->forgetCache($reflection->date->toDateString());

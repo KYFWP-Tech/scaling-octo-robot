@@ -15,6 +15,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 
 abstract class TestCase extends BaseTestCase
@@ -126,11 +127,35 @@ abstract class TestCase extends BaseTestCase
         return [
             'title' => 'Test Article',
             'content' => 'Article body content.',
-            'cover_image' => 'https://example.com/cover.jpg',
-            'media' => null,
             'category_id' => $category->id,
             'is_featured' => true,
         ];
+    }
+
+    /**
+     * @param  list<string>  $paths
+     * @return array<int, array{type: string, path: string}>
+     */
+    protected function fakeArticleMediaOnStorage(array $paths = ['articles/test.jpg']): array
+    {
+        Storage::fake('s3');
+
+        $media = [];
+
+        foreach ($paths as $path) {
+            Storage::disk('s3')->put($path, 'content');
+            $media[] = ['type' => 'image', 'path' => $path];
+        }
+
+        return $media;
+    }
+
+    protected function fakeReflectionFileOnStorage(string $path = 'reflections/test.mp3'): string
+    {
+        Storage::fake('s3');
+        Storage::disk('s3')->put($path, 'content');
+
+        return $path;
     }
 
     /**
