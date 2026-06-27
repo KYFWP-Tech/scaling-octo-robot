@@ -9,46 +9,38 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Article extends Model
+class Podcast extends Model
 {
-    use HasMedia, HasUuids, HasFactory, Sluggable;
+    use HasFactory, HasMedia, HasUuids, Sluggable;
 
-    public const MEDIA_STORAGE_PREFIX = 'articles';
+    public const MEDIA_STORAGE_PREFIX = 'podcasts';
 
     protected $fillable = [
         'title',
-        'content',
         'slug',
+        'content',
+        'cover_image',
         'user_id',
         'status',
-        'cover_image',
-        'media',
-        'category_id',
-        'is_featured',
         'published_at',
-        'created_at',
-        'updated_at',
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'published_at' => 'datetime',
-        'media' => 'array',
         'status' => Status::class,
     ];
 
     /**
-     * Return the sluggable configuration array for this model.
-     *
-     * @return array
+     * @return array<string, array<string, string>>
      */
     public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 
@@ -57,8 +49,8 @@ class Article extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function category(): BelongsTo
+    public function episodes(): HasMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Episode::class)->orderBy('episode_number');
     }
 }

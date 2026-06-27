@@ -41,6 +41,7 @@ describe('Article', function () {
 
             $this->assertDatabaseHas('articles', [
                 'title' => $payload['title'],
+                'user_id' => auth()->id(),
                 'status' => Status::INACTIVE->value,
             ]);
         });

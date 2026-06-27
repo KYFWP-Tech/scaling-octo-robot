@@ -7,8 +7,14 @@ use App\Models\Admin;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Contributor;
+use App\Models\Episode;
+use App\Models\Permission;
+use App\Models\Podcast;
 use App\Models\Reader;
+use App\Models\Reflection;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Verification;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -66,9 +72,15 @@ class AppServiceProvider extends ServiceProvider
             'admin' => Admin::class,
             'article' => Article::class,
             'category' => Category::class,
+            'episode' => Episode::class,
+            'permission' => Permission::class,
+            'podcast' => Podcast::class,
             'contributor' => Contributor::class,
             'reader' => Reader::class,
+            'reflection' => Reflection::class,
+            'role' => Role::class,
             'user' => User::class,
+            'verification' => Verification::class,
         ]);
 
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {

@@ -21,6 +21,9 @@ class ArticleController implements HasMiddleware
     public static function middleware(): array
     {
         return [
+            new Middleware('can:index,'.Article::class)->only(['index']),
+            new Middleware('can:store,'.Article::class)->only(['store']),
+            new Middleware('can:show,article')->only(['show']),
             new Middleware('can:update,article')->only(['update']),
             new Middleware('can:destroy,article')->only(['destroy']),
         ];
@@ -54,8 +57,7 @@ class ArticleController implements HasMiddleware
         $article->category_id = $request->category_id;
         $article->is_featured = $request->boolean('is_featured');
         $article->status = Status::INACTIVE->value;
-        $article->author_id = Auth::user()->id;
-        $article->author_type = Auth::user()->getMorphClass();
+        $article->user_id = Auth::id();
         $article->save();
 
         /** @status 201 */

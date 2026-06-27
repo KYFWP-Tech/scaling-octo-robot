@@ -3,16 +3,15 @@
 namespace Database\Factories;
 
 use App\Enums\Status;
-use App\Models\Article;
-use App\Models\Category;
 use App\Models\Contributor;
+use App\Models\Podcast;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Article>
+ * @extends Factory<Podcast>
  */
-class ArticleFactory extends Factory
+class PodcastFactory extends Factory
 {
     /**
      * @return array<string, mixed>
@@ -23,18 +22,15 @@ class ArticleFactory extends Factory
             'title' => fake()->sentence(),
             'content' => fake()->paragraphs(3, true),
             'cover_image' => null,
-            'media' => [],
-            'category_id' => Category::factory(),
             'status' => Status::INACTIVE,
-            'is_featured' => false,
             'published_at' => null,
         ];
     }
 
     public function configure(): static
     {
-        return $this->afterMaking(function (Article $article) {
-            if ($article->user_id) {
+        return $this->afterMaking(function (Podcast $podcast) {
+            if ($podcast->user_id) {
                 return;
             }
 
@@ -47,7 +43,7 @@ class ArticleFactory extends Factory
                 'profile_type' => $contributor->getMorphClass(),
             ]);
 
-            $article->user_id = $user->id;
+            $podcast->user_id = $user->id;
         });
     }
 

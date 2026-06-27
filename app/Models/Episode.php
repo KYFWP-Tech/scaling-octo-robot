@@ -10,31 +10,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Article extends Model
+class Episode extends Model
 {
-    use HasMedia, HasUuids, HasFactory, Sluggable;
+    use HasFactory, HasMedia, HasUuids, Sluggable;
 
-    public const MEDIA_STORAGE_PREFIX = 'articles';
+    public const MEDIA_STORAGE_PREFIX = 'podcasts';
 
     protected $fillable = [
+        'podcast_id',
         'title',
         'content',
-        'slug',
-        'user_id',
+        'file',
+        'episode_number',
         'status',
-        'cover_image',
-        'media',
-        'category_id',
-        'is_featured',
         'published_at',
-        'created_at',
-        'updated_at',
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'published_at' => 'datetime',
-        'media' => 'array',
         'status' => Status::class,
     ];
 
@@ -52,13 +45,8 @@ class Article extends Model
         ];
     }
 
-    public function author(): BelongsTo
+    public function podcast(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Podcast::class);
     }
 }

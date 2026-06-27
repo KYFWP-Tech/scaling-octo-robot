@@ -3,13 +3,16 @@
 use App\Http\Middleware\EnforceJson;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\XSSProtection;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -47,10 +50,39 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
+        $exceptions->renderable(function (AuthenticationException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
-                    'message' => (strpos($e->getMessage(), 'No query results for model [App\\Models\\') !== false) ? 'Record not found' : "Ooops!!! An error occured!",
+                    'message' => $e->getMessage() ?: 'Unauthenticated.',
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+        });
+
+        $exceptions->renderable(function (ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                    'errors' => $e->errors(),
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        });
+
+        $exceptions->renderable(function (HttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                ], $e->getStatusCode());
+            }
+        });
+
+        $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                $message = str_contains($e->getMessage(), 'No query results for model [App\\Models\\')
+                    ? 'Record not found'
+                    : ($e->getMessage() ?: 'Ooops!!! An error occured!');
+
+                return response()->json([
+                    'message' => $message,
                 ], Response::HTTP_NOT_FOUND);
             }
         });
@@ -72,10 +104,12 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
 
-        $exceptions->renderable(function (Exception $e, Request $request) {
-            if ($request->is('api/*')) {
+        $exceptions->renderable(function (\Exception $e, Request $request) {
+            if ($request->is('api/*')
+                && ! $e instanceof AuthenticationException
+                && ! $e instanceof ValidationException) {
                 return response()->json([
-                    'message' =>  $e->getMessage(),
+                    'message' => $e->getMessage(),
                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
         });

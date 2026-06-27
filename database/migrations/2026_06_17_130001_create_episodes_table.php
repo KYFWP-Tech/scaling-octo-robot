@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
+        Schema::create('episodes', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('podcast_id');
             $table->string('title');
             $table->string('slug')->unique();
             $table->longText('content');
-            $table->uuid('user_id');
-            $table->longText('cover_image')->nullable();
-            $table->longText('media')->nullable();
-            $table->uuid('category_id');
-            $table->boolean('is_featured')->default(false);
+            $table->string('file')->nullable();
+            $table->unsignedInteger('episode_number')->nullable();
             $table->char('status', 1);
             $table->dateTime('published_at')->nullable();
             $table->timestamps();
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('episodes');
     }
 };
